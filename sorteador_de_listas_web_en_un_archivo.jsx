@@ -16,7 +16,7 @@
   <body class="min-h-screen bg-neutral-900 text-neutral-100">
     <div id="root"></div>
 
-    <script type="text/babel">
+    <script type="text/babel" data-presets="react">
       const { useEffect, useMemo, useRef, useState } = React;
 
       const STORAGE_KEY = "sorteador_listas_v1";
@@ -27,7 +27,8 @@
       const loadFromStorage = () => {
         try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
       };
-      const parseLines = (text) => text.split(/?
+      const parseLines = (text) => text.split(/
+?
 /).map((s)=>s.trim()).filter(Boolean);
       const download = (filename, content, type = "text/plain") => {
         const blob = new Blob([content], { type });
