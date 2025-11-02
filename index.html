@@ -4,12 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sorteador de listas</title>
-    <!-- Tailwind CDN (sin build) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React + ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <!-- Babel para transpilar JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <meta name="color-scheme" content="dark" />
   </head>
@@ -25,11 +22,16 @@
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
       };
       const loadFromStorage = () => {
-        try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
       };
-      const parseLines = (text) => text.split(/
-?
-/).map((s)=>s.trim()).filter(Boolean);
+
+      // ✅ corregido
+      const parseLines = (text) =>
+        text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+
       const download = (filename, content, type = "text/plain") => {
         const blob = new Blob([content], { type });
         const url = URL.createObjectURL(blob);
@@ -58,7 +60,11 @@
       function toast(msg, ms = 1200) {
         const el = document.createElement("div");
         el.textContent = msg;
-        Object.assign(el.style, { position:"fixed", bottom:"16px", left:"50%", transform:"translateX(-50%)", padding:"8px 12px", background:"rgba(255,255,255,0.9)", color:"#111", borderRadius:"12px", fontSize:"12px", zIndex:9999 });
+        Object.assign(el.style, {
+          position:"fixed", bottom:"16px", left:"50%", transform:"translateX(-50%)",
+          padding:"8px 12px", background:"rgba(255,255,255,0.9)", color:"#111",
+          borderRadius:"12px", fontSize:"12px", zIndex:9999
+        });
         document.body.appendChild(el); setTimeout(()=>el.remove(), ms);
       }
 
@@ -103,6 +109,7 @@
       function App() {
         const [state, setState] = useState(() => loadFromStorage() ?? initialState);
         const [bulkText, setBulkText] = useState("");
+        the
         const [newItem, setNewItem] = useState("");
         const [lastWinner, setLastWinner] = useState(null);
         const [seed, setSeed] = useState("");
@@ -152,8 +159,8 @@
         };
         const exportCSV = () => {
           const rows = [["estado","valor"], ...state.items.map((v)=>["pendiente", v]), ...state.drawn.map((v)=>["sorteado", v])];
-          const csv = rows.map((r)=>r.map((c)=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("
-");
+          // ✅ corregido
+          const csv = rows.map((r)=>r.map((c)=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
           download("sorteador.csv", csv, "text/csv");
         };
         const importFile = (file) => {
@@ -211,10 +218,7 @@
                   </div>
                   <textarea
                     className="w-full h-40 rounded-xl p-3 bg-neutral-900 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white/30"
-                    placeholder={"Ej.:
-Ana
-Luis
-Carla"}
+                    placeholder={`Ej.:\nAna\nLuis\nCarla`}
                     value={bulkText}
                     onChange={(e) => setBulkText(e.target.value)}
                   />
